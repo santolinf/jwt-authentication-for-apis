@@ -1,6 +1,7 @@
 buildscript {
 	ext {
 		lombokVersion = '1.18.22'
+		guavaVersion = '31.0.1-jre'
 		mapstructVersion = '1.4.2.Final'
 		swaggerVersion = '3.0.0'
 	}
@@ -36,7 +37,7 @@ dependencies {
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
-	implementation 'com.google.guava:guava:31.0.1-jre'
+	implementation "com.google.guava:guava:${guavaVersion}"
 
 	compileOnly 'org.springframework.boot:spring-boot-devtools'
 
