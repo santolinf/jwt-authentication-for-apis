@@ -1,0 +1,43 @@
+{
+	"info": {
+		"_postman_id": "6b1308f4-0c83-4228-a1d4-552a6c5e602d",
+		"name": "SimplySend JWT liveProject",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "User Sign-up",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"emailId\": \"jb@test.com\",\r\n    \"password\": \"!1cense2Kill\",\r\n    \"firstName\": \"James\",\r\n    \"lastName\": \"Bond\",\r\n    \"age\": 30,\r\n    \"address\": \"Wellington Square\",\r\n    \"phone\": \"01234 567890\",\r\n    \"tag\": \"007\",\r\n    \"role\": \"REPORTEE\",\r\n    \"managerName\": \"M\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost:8080/v1/users",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"users"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

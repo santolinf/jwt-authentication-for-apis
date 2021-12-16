@@ -1,13 +1,13 @@
-package com.manning.liveproject.jwt.authenticationforapi;
+package com.manning.liveproject.simplysend;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class AuthenticationForApiApplication {
+public class SimplySendApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(AuthenticationForApiApplication.class, args);
+		SpringApplication.run(SimplySendApplication.class, args);
 	}
 
 }
