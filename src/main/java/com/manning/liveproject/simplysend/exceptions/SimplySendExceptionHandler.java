@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -56,8 +58,34 @@ public class SimplySendExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @Override
+    protected ResponseEntity<Object> handleHttpRequestMethodNotSupported(
+            HttpRequestMethodNotSupportedException e,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        ErrorDto.ErrorDtoBuilder errorResponse = createErrorResponse(ErrorCode.BAD_REQUEST)
+                .message(e.getMessage());
+
+        return new ResponseEntity<>(errorResponse.build(), headers, status);
+    }
+
+    @Override
     protected ResponseEntity<Object> handleHttpMediaTypeNotSupported(
             HttpMediaTypeNotSupportedException e,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        ErrorDto.ErrorDtoBuilder errorResponse = createErrorResponse(ErrorCode.BAD_REQUEST)
+                .message(e.getMessage());
+
+        return new ResponseEntity<>(errorResponse.build(), headers, status);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleMissingServletRequestParameter(
+            MissingServletRequestParameterException e,
             HttpHeaders headers,
             HttpStatus status,
             WebRequest request

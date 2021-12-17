@@ -4,10 +4,9 @@ import com.manning.liveproject.simplysend.BaseIntegrationTest;
 import com.manning.liveproject.simplysend.api.dto.UserDto;
 import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.entity.UserAccount;
-import com.manning.liveproject.simplysend.entity.UserProfile;
-import com.manning.liveproject.simplysend.repository.UserAccountRepository;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.MediaType;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,10 +15,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class CreateUserIntegrationTest extends BaseIntegrationTest {
 
-    @Autowired
-    private UserAccountRepository userAccountRepository;
+    @AfterAll
+    public void tearDown() {
+        cleanDb();
+    }
 
     @Test
     public void givenMissingEmailId_whenCreateUser_thenReturnBadRequest() throws Exception {
@@ -47,15 +49,13 @@ public class CreateUserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void givenExistingUsername_whenCreateUser_thenReturnConflict() throws Exception {
-        String email = "bob@test.com";
-        UserAccount existingUser = UserAccount.builder()
-                .username(email)
-                .profile(UserProfile.builder().email(email).build())
-                .build();
-        userAccountRepository.save(existingUser);
+        String emailId = "bob@test.com";
+        String password = "Ch4ng*me0lease";
 
-        UserDto newUserPayload = UserDto.builder().emailId(email)
-                .password("Ch4ng*me0lease")
+        createAccountInDb(emailId, password);
+
+        UserDto newUserPayload = UserDto.builder().emailId(emailId)
+                .password(password)
                 .phone("0555555555")
                 .build();
 
