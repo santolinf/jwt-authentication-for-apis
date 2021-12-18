@@ -2,14 +2,17 @@ package com.manning.liveproject.simplysend.configuration;
 
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.config.JwtProperties;
+import com.manning.liveproject.simplysend.auth.fliter.JwtHeaderAuthenticationFilter;
 import com.manning.liveproject.simplysend.auth.handler.SimplySendAuthenticationSuccessHandler;
 import com.manning.liveproject.simplysend.auth.service.SimplySendUserDetailsService;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -18,6 +21,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
@@ -42,11 +46,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(WebSecurity web) throws Exception {
+        web.ignoring().mvcMatchers(
+                // allow access to swagger
+                "/**/swagger**/**",
+                "/**/api-docs**"
+        );
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
         final HttpStatusEntryPoint failedAuthenticationEntryPoint = new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
         http
+                .addFilterBefore(new JwtHeaderAuthenticationFilter(jwtProperties()), UsernamePasswordAuthenticationFilter.class)
+
                 .authorizeHttpRequests()
-                    .anyRequest().permitAll()
+                    .mvcMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+                    .anyRequest().authenticated()
 
                 .and()
                 .sessionManagement()
