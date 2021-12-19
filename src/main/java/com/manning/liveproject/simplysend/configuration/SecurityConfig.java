@@ -5,6 +5,7 @@ import com.manning.liveproject.simplysend.auth.config.JwtProperties;
 import com.manning.liveproject.simplysend.auth.fliter.JwtHeaderAuthenticationFilter;
 import com.manning.liveproject.simplysend.auth.handler.SimplySendAuthenticationSuccessHandler;
 import com.manning.liveproject.simplysend.auth.service.SimplySendUserDetailsService;
+import com.manning.liveproject.simplysend.auth.service.TokenService;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -45,6 +46,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return new JwtProperties();
     }
 
+    @Bean
+    public TokenService tokenService() {
+        return new TokenService(jwtProperties());
+    };
+
     @Override
     public void configure(WebSecurity web) throws Exception {
         web.ignoring().mvcMatchers(
@@ -75,7 +81,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .loginProcessingUrl(SecurityConstants.LOGIN_URL)
                     .usernameParameter(SecurityConstants.LOGIN_KEY_USERNAME)
                     .failureHandler(new AuthenticationEntryPointFailureHandler(failedAuthenticationEntryPoint))
-                    .successHandler(new SimplySendAuthenticationSuccessHandler(jwtProperties()))
+                    .successHandler(new SimplySendAuthenticationSuccessHandler(tokenService()))
 
                 .and()
                 .exceptionHandling()

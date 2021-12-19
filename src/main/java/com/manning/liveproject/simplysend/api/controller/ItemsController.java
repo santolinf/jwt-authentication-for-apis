@@ -8,7 +8,6 @@ import io.swagger.annotations.Api;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
-import io.swagger.v3.oas.annotations.headers.Header;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -36,9 +35,7 @@ public class ItemsController {
             @SecurityRequirement(name = "jwt")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "A paged array of items",
-                    headers = { @Header(name = "x-next", description = "A link to the next page of responses") }
-            ),
+            @ApiResponse(responseCode = "200", description = "A paged array of items"),
             @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
     })
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)

@@ -1,5 +1,6 @@
 package com.manning.liveproject.simplysend.api.dto;
 
+import com.fasterxml.jackson.annotation.*;
 import lombok.Data;
 
 import javax.annotation.Nullable;
@@ -7,8 +8,10 @@ import java.util.Iterator;
 import java.util.List;
 
 @Data
+@JsonIncludeProperties("content")
 public final class PagedResponse<T> implements Iterable<T> {
 
+    @JsonValue
     private List<T> content;
     private Integer pageNumber;
     private Integer pageSize;

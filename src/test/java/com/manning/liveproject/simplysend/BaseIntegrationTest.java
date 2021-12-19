@@ -2,12 +2,14 @@ package com.manning.liveproject.simplysend;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manning.liveproject.simplysend.api.enums.Role;
+import com.manning.liveproject.simplysend.auth.service.TokenService;
 import com.manning.liveproject.simplysend.entity.UserAccount;
 import com.manning.liveproject.simplysend.entity.UserProfile;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.authentication.TestingAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +29,9 @@ public abstract class BaseIntegrationTest {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private TokenService tokenService;
+
+    @Autowired
     protected UserAccountRepository userAccountRepository;
 
     protected void createAccountInDb(String emailId, String password) {
@@ -41,6 +46,11 @@ public abstract class BaseIntegrationTest {
                 )
                 .build();
         userAccountRepository.save(account);
+    }
+
+    protected String login(String emailId, String password) {
+        createAccountInDb(emailId, password);
+        return tokenService.generateToken(new TestingAuthenticationToken(emailId, password));
     }
 
     protected void cleanDb() {
