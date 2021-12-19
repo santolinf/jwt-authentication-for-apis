@@ -1,6 +1,7 @@
 package com.manning.liveproject.simplysend.api.controller;
 
 import com.manning.liveproject.simplysend.api.dto.ItemDto;
+import com.manning.liveproject.simplysend.api.dto.PagedResponse;
 import com.manning.liveproject.simplysend.api.enums.ItemType;
 import com.manning.liveproject.simplysend.service.ItemsService;
 import io.swagger.annotations.Api;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.util.List;
 
 @Api(tags = { "items" })
 @RestController
@@ -43,7 +43,7 @@ public class ItemsController {
     })
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
-    public List<ItemDto> listItems(
+    public PagedResponse<ItemDto> listItems(
             @Parameter(
                     in = ParameterIn.QUERY,
                     description = "type of the item",
@@ -55,8 +55,13 @@ public class ItemsController {
                     description = "How many items to return at one time (max 100)"
             )
             @Valid @Min(1) @Max(100)
-            @RequestParam(value = "limit", required = false) Integer limit
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "page number"
+            )
+            @RequestParam(value = "page", required = false) Integer page
     ) {
-        return itemsService.findItems(type, limit);
+        return itemsService.findItems(type, limit, page);
     }
 }

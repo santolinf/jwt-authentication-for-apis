@@ -8,5 +8,7 @@ public final class SecurityConstants {
     public static final String LOGIN_URL = "/login";
     public static final String LOGIN_KEY_USERNAME = "emailId";
 
+    public static final String HEADER_X_AUTH_MESSAGE = "X-Auth-Message";
+
     private SecurityConstants() {}
 }

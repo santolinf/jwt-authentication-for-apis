@@ -48,6 +48,7 @@ public class JwtHeaderAuthenticationFilter extends OncePerRequestFilter {
             log.debug("JWT: {}", authentication);
         } catch (TokenExpiredException e) {
             log.debug("JWT: {}", e.getMessage());
+            response.setHeader(SecurityConstants.HEADER_X_AUTH_MESSAGE, "Token expired");
         }
 
         filterChain.doFilter(request, response);
