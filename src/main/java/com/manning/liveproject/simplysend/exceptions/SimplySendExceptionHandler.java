@@ -2,6 +2,7 @@ package com.manning.liveproject.simplysend.exceptions;
 
 import com.manning.liveproject.simplysend.api.enums.ErrorCode;
 import com.manning.liveproject.simplysend.api.dto.ErrorDto;
+import org.springframework.beans.TypeMismatchException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +39,19 @@ public class SimplySendExceptionHandler extends ResponseEntityExceptionHandler {
         );
 
         return new ResponseEntity<>(errorResponse.build(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleTypeMismatch(
+            TypeMismatchException e,
+            HttpHeaders headers,
+            HttpStatus status,
+            WebRequest request
+    ) {
+        ErrorDto.ErrorDtoBuilder errorResponse = createErrorResponse(ErrorCode.BAD_REQUEST)
+                .message("Invalid value: " + e.getValue());
+
+        return new ResponseEntity<>(errorResponse.build(), headers, status);
     }
 
     @Override

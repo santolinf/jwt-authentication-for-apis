@@ -15,13 +15,13 @@ public enum Role {
     @Override
     @JsonValue
     public String toString() {
-        return String.valueOf(value);
+        return value;
     }
 
     @JsonCreator
     public static Role fromValue(String text) {
         for (Role role : Role.values()) {
-            if (String.valueOf(role.value).equals(text)) {
+            if (role.value.equals(text)) {
                 return role;
             }
         }
