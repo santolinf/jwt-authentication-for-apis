@@ -1,6 +1,7 @@
 package com.manning.liveproject.simplysend.auth.handler;
 
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
+import com.manning.liveproject.simplysend.auth.service.InMemorySessionService;
 import com.manning.liveproject.simplysend.auth.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SimplySendAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final TokenService tokenService;
+    private final InMemorySessionService sessionService;
 
     @Override
     public void onAuthenticationSuccess(
@@ -23,6 +25,8 @@ public class SimplySendAuthenticationSuccessHandler implements AuthenticationSuc
             Authentication authentication
     ) {
         String token = tokenService.generateToken(authentication);
+
+        sessionService.add(authentication.getName());
 
         response.setHeader(HttpHeaders.AUTHORIZATION, SecurityConstants.TOKEN_PREFIX + token);
         response.setStatus(HttpStatus.OK.value());

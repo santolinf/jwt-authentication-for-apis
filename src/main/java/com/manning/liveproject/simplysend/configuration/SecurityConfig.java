@@ -4,6 +4,8 @@ import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.config.JwtProperties;
 import com.manning.liveproject.simplysend.auth.fliter.JwtHeaderAuthenticationFilter;
 import com.manning.liveproject.simplysend.auth.handler.SimplySendAuthenticationSuccessHandler;
+import com.manning.liveproject.simplysend.auth.handler.SimplySendLogoutHandler;
+import com.manning.liveproject.simplysend.auth.service.InMemorySessionService;
 import com.manning.liveproject.simplysend.auth.service.SimplySendUserDetailsService;
 import com.manning.liveproject.simplysend.auth.service.TokenService;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
@@ -23,12 +25,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserAccountRepository userAccountRepository;
+    private final InMemorySessionService sessionService;
 
     @Bean
     public UserDetailsService userDetailsService() {
@@ -64,7 +68,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         final HttpStatusEntryPoint failedAuthenticationEntryPoint = new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
         http
-                .addFilterBefore(new JwtHeaderAuthenticationFilter(jwtProperties()), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(
+                        new JwtHeaderAuthenticationFilter(tokenService(), sessionService),
+                        UsernamePasswordAuthenticationFilter.class
+                )
 
                 .authorizeHttpRequests()
                     .mvcMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
@@ -81,7 +88,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .loginProcessingUrl(SecurityConstants.LOGIN_URL)
                     .usernameParameter(SecurityConstants.LOGIN_KEY_USERNAME)
                     .failureHandler(new AuthenticationEntryPointFailureHandler(failedAuthenticationEntryPoint))
-                    .successHandler(new SimplySendAuthenticationSuccessHandler(tokenService()))
+                    .successHandler(new SimplySendAuthenticationSuccessHandler(tokenService(), sessionService))
+
+                .and().logout()
+                    .addLogoutHandler(new SimplySendLogoutHandler(tokenService(), sessionService))
+                    .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK))    // do not redirect
 
                 .and()
                 .exceptionHandling()
