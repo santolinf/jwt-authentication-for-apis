@@ -103,7 +103,7 @@ public class CreateUserIntegrationTest extends BaseIntegrationTest {
 
         UserAccount account = userAccountRepository.findByUsername(username).orElse(null);
         assertThat(account).isNotNull();
-        assertThat(account.getEnabled()).isFalse();
+        assertThat(account.getEnabled()).isTrue();
         assertThat(account.getPassword()).isNotNull();
         assertThat(account.getPassword()).isNotEqualTo(plainTextPassword);
 

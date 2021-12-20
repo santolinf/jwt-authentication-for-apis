@@ -41,6 +41,14 @@ public class SimplySendExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse.build(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(InvalidIdentifierException.class)
+    public ResponseEntity<ErrorDto> handleInvalidId(InvalidIdentifierException e) {
+        ErrorDto.ErrorDtoBuilder errorResponse = createErrorResponse(ErrorCode.BAD_REQUEST)
+                .message(e.getMessage());
+
+        return new ResponseEntity<>(errorResponse.build(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
+
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
             TypeMismatchException e,
