@@ -21,6 +21,8 @@ public class UserService {
 
     public void createUser(UserDto user) {
         UserAccount account = mapper.userDtoToUserAccount(user);
+        account.setEnabled(true);
+
         UserProfile profile = mapper.userDtoToUserProfile(user);
         account.setProfile(profile);
         // TODO !Strings.isNullOrEmpty(user.getManagerName())

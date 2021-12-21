@@ -5,6 +5,8 @@ import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.entity.UserAccount;
 import com.manning.liveproject.simplysend.entity.UserProfile;
+import com.manning.liveproject.simplysend.repository.ItemRepository;
+import com.manning.liveproject.simplysend.repository.OrderRepository;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,6 +38,12 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected UserAccountRepository userAccountRepository;
 
+    @Autowired
+    protected OrderRepository orderRepository;
+
+    @Autowired
+    protected ItemRepository itemRepository;
+
     protected void createAccountInDb(String emailId, String password) {
         UserAccount account = UserAccount.builder()
                 .username(emailId)
@@ -50,7 +58,8 @@ public abstract class BaseIntegrationTest {
         userAccountRepository.save(account);
     }
 
-    protected String login(String emailId, String password) throws Exception {
+    protected String loginAs(String emailId) throws Exception {
+        String password = "Ch4ng*me0lease";
         if (userAccountRepository.findByUsername(emailId).isEmpty()) {
             createAccountInDb(emailId, password);
         }
@@ -72,6 +81,8 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void cleanDb() {
+        orderRepository.deleteAll();
+        itemRepository.deleteAll();
         userAccountRepository.deleteAll();
     }
 }

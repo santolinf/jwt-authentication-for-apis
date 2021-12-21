@@ -26,7 +26,7 @@ public class ItemsIntegrationTest extends BaseIntegrationTest {
 
     @Test
     public void givenNoItemsInDb_whenListItems_thenReturnEmptyResponse() throws Exception {
-        String token = login("james@test.com", "Ch4ng*me0lease");
+        String token = loginAs("james@test.com");
 
         mockMvc.perform(get("/items")
                         .header("Authorization", TOKEN_PREFIX + token))
