@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.entity.UserAccount;
-import com.manning.liveproject.simplysend.entity.UserProfile;
+import com.manning.liveproject.simplysend.entity.User;
 import com.manning.liveproject.simplysend.repository.ItemRepository;
 import com.manning.liveproject.simplysend.repository.OrderRepository;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
@@ -49,7 +49,7 @@ public abstract class BaseIntegrationTest {
                 .username(emailId)
                 .password(passwordEncoder.encode(password))
                 .enabled(true)
-                .profile(UserProfile.builder()
+                .user(User.builder()
                         .email(emailId)
                         .role(Role.REPORTEE)
                         .build()

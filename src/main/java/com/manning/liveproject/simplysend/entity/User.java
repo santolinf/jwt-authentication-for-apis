@@ -13,7 +13,12 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "USER_PROFILE")
 @ToString(callSuper = true)
-public class UserProfile extends BaseEntity {
+public class User extends BaseEntity {
+
+    @Id
+    @GeneratedValue(generator = "user_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "user_seq", sequenceName = "user_profile_id_seq", initialValue = 1, allocationSize = 1)
+    protected Long id;
 
     private String firstName;
     private String lastName;
@@ -28,5 +33,5 @@ public class UserProfile extends BaseEntity {
     private Role role;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private UserProfile manager;
+    private User manager;
 }

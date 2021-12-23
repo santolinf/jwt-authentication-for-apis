@@ -1,8 +1,6 @@
 package com.manning.liveproject.simplysend.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.Set;
@@ -13,6 +11,11 @@ import java.util.Set;
 @Table(name = "ORDERS")
 @ToString(callSuper = true)
 public class Order extends BaseEntity {
+
+    @Id
+    @GeneratedValue(generator = "order_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "order_seq", sequenceName = "orders_id_seq", initialValue = 1, allocationSize = 1)
+    protected Long id;
 
     private String status;
     private String reason;
@@ -28,5 +31,5 @@ public class Order extends BaseEntity {
     @ToString.Exclude
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", referencedColumnName = "id")
-    private UserProfile owner;
+    private User owner;
 }

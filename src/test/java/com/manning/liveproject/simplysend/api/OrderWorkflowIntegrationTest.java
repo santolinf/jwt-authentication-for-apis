@@ -11,8 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.MediaType;
 
-import javax.transaction.Transactional;
-
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -56,7 +54,6 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
                 .andExpect(jsonPath("$.violations.items").value("must not be empty"));
     }
 
-    @Transactional
     @Test
     public void whenRequestOrder_thenCreateNewOrderDetails() throws Exception {
         Item laptop = Item.builder().name("laptop").type(ItemType.HARDWARE.getValue()).price(1_000).build();

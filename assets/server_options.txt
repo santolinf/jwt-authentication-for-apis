@@ -1,0 +1,3 @@
+-Dlogging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+-Dspring.jpa.show-sql=true
+-Dlogging.level.com.manning.liveproject.simplysend=DEBUG

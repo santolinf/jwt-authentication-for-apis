@@ -18,7 +18,7 @@ public class SimplySendUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userAccountRepository.findByUsername(username)
                 .map(account -> {
-                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority(account.getProfile().getRole().name());
+                    SimpleGrantedAuthority authority = new SimpleGrantedAuthority(account.getUser().getRole().name());
                     return new User(
                             username,
                             account.getPassword(),
