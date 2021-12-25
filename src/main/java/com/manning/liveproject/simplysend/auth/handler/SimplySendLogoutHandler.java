@@ -1,8 +1,11 @@
 package com.manning.liveproject.simplysend.auth.handler;
 
+import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.service.InMemorySessionService;
 import com.manning.liveproject.simplysend.auth.service.TokenService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 
@@ -12,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * User logout to ensure the user’s session is not misused after user operations are completed.
  */
+@Slf4j
 @RequiredArgsConstructor
 public class SimplySendLogoutHandler implements LogoutHandler {
 
@@ -26,7 +30,12 @@ public class SimplySendLogoutHandler implements LogoutHandler {
             return;
         }
 
-        String username = tokenService.verifyToken(token).getSubject();
-        sessionService.remove(username);
+        try {
+            String username = tokenService.verifyToken(token).getSubject();
+            sessionService.remove(username);
+        } catch (TokenExpiredException e) {
+            log.debug("JWT: {}", e.getMessage());
+            response.setHeader(SecurityConstants.HEADER_X_AUTH_MESSAGE, "Token expired");
+        }
     }
 }

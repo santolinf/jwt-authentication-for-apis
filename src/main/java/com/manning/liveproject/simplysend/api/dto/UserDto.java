@@ -45,8 +45,8 @@ public class UserDto {
             message = "password should contain, at minimum, one number, one capital letter, and one special character")
     private String password;
 
-    @Schema(description = "Name of the Manager to whom current User reports to")
-    private String managerName;
+    @Schema(description = "Id of the Manager to whom current User reports to")
+    private Long managerId;
 
     private String address;
 

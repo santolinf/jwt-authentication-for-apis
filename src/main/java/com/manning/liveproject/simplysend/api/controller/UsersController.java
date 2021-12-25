@@ -9,7 +9,6 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -27,9 +26,7 @@ public class UsersController {
 
     private final UserService userService;
 
-    @Operation(summary = "create a User", tags = { "users" }/*, security = {
-            @SecurityRequirement(name = "jwt"),
-    }*/)
+    @Operation(summary = "create a User", tags = { "users" })
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Account created"),
             @ApiResponse(responseCode = "400", description = "Field is missing or invalid"),

@@ -1,20 +1,23 @@
 package com.manning.liveproject.simplysend.entity;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Data
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
 @EqualsAndHashCode(callSuper = true)
 @Table(name = "ITEM")
 @ToString(callSuper = true)
 public class Item extends BaseEntity {
+
+    @Id
+    @GeneratedValue(generator = "item_seq", strategy = GenerationType.SEQUENCE)
+    @SequenceGenerator(name = "item_seq", sequenceName = "item_id_seq", initialValue = 1, allocationSize = 1)
+    protected Long id;
 
     private String type;
     private String name;

@@ -1,5 +1,6 @@
 package com.manning.liveproject.simplysend.configuration;
 
+import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.config.JwtProperties;
 import com.manning.liveproject.simplysend.auth.fliter.JwtHeaderAuthenticationFilter;
@@ -75,6 +76,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeHttpRequests()
                     .mvcMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
+                    .mvcMatchers(HttpMethod.GET, "/orders").hasAuthority(Role.MGR.name())
+                    .mvcMatchers(HttpMethod.POST, "/orders/*/approve").hasAuthority(Role.MGR.name())
                     .anyRequest().authenticated()
 
                 .and()

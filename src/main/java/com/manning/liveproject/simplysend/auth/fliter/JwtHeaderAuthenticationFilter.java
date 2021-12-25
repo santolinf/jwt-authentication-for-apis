@@ -1,6 +1,7 @@
 package com.manning.liveproject.simplysend.auth.fliter;
 
 import com.auth0.jwt.exceptions.TokenExpiredException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.collect.Lists;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.service.InMemorySessionService;
@@ -8,6 +9,7 @@ import com.manning.liveproject.simplysend.auth.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,6 +18,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_AUTHORITY_CLAIM_NAME;
+import static java.util.Optional.ofNullable;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,21 +34,26 @@ public class JwtHeaderAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        String token  = request.getHeader("Authorization");
+        String encodedToken  = request.getHeader("Authorization");
 
-        if (tokenService.isNullOrEmptyOrNotTokenString(token)) {
+        if (tokenService.isNullOrEmptyOrNotTokenString(encodedToken)) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String username = tokenService.verifyToken(token).getSubject();
+            DecodedJWT token = tokenService.verifyToken(encodedToken);
+            String username = token.getSubject();
+            List<SimpleGrantedAuthority> authorities =
+                    ofNullable(token.getClaim(TOKEN_AUTHORITY_CLAIM_NAME))
+                            .map(claim -> claim.asList(String.class).stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                            .orElse(Lists.newArrayList());
 
             if (sessionService.exists(username)) {
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         username,
                         null,
-                        Lists.newArrayList()
+                        authorities
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);

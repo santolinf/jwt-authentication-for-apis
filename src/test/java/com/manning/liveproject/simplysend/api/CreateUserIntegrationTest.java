@@ -92,7 +92,7 @@ public class CreateUserIntegrationTest extends BaseIntegrationTest {
                 .address("123 Phantom Road")
                 .phone("0555555555")
                 .role(Role.REPORTEE)
-                .managerName("Adam Smith")
+                .managerId(1L)
                 .tag("my-tag")
                 .build();
 
@@ -103,10 +103,10 @@ public class CreateUserIntegrationTest extends BaseIntegrationTest {
 
         UserAccount account = userAccountRepository.findByUsername(username).orElse(null);
         assertThat(account).isNotNull();
-        assertThat(account.getEnabled()).isFalse();
+        assertThat(account.getEnabled()).isTrue();
         assertThat(account.getPassword()).isNotNull();
         assertThat(account.getPassword()).isNotEqualTo(plainTextPassword);
 
-        assertThat(account.getProfile()).isNotNull();
+        assertThat(account.getUser()).isNotNull();
     }
 }

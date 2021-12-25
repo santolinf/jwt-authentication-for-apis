@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.entity.UserAccount;
-import com.manning.liveproject.simplysend.entity.UserProfile;
+import com.manning.liveproject.simplysend.entity.User;
+import com.manning.liveproject.simplysend.repository.ItemRepository;
+import com.manning.liveproject.simplysend.repository.OrderRepository;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -36,23 +38,38 @@ public abstract class BaseIntegrationTest {
     @Autowired
     protected UserAccountRepository userAccountRepository;
 
+    @Autowired
+    protected OrderRepository orderRepository;
+
+    @Autowired
+    protected ItemRepository itemRepository;
+
     protected void createAccountInDb(String emailId, String password) {
+        createAccountInDb(emailId, password, Role.REPORTEE);
+    }
+
+    protected void createAccountInDb(String emailId, String password, Role role) {
         UserAccount account = UserAccount.builder()
                 .username(emailId)
                 .password(passwordEncoder.encode(password))
                 .enabled(true)
-                .profile(UserProfile.builder()
+                .user(User.builder()
                         .email(emailId)
-                        .role(Role.REPORTEE)
+                        .role(role)
                         .build()
                 )
                 .build();
         userAccountRepository.save(account);
     }
 
-    protected String login(String emailId, String password) throws Exception {
+    protected String loginAs(String emailId) throws Exception {
+        return loginAs(emailId, Role.REPORTEE);
+    }
+
+    protected String loginAs(String emailId, Role role) throws Exception {
+        String password = "Ch4ng*me0lease";
         if (userAccountRepository.findByUsername(emailId).isEmpty()) {
-            createAccountInDb(emailId, password);
+            createAccountInDb(emailId, password, role);
         }
 
         String token = mockMvc.perform(post("/login")
@@ -72,6 +89,8 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void cleanDb() {
+        orderRepository.deleteAll();
+        itemRepository.deleteAll();
         userAccountRepository.deleteAll();
     }
 }

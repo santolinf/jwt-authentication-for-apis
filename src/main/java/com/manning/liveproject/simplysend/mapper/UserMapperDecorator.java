@@ -19,7 +19,6 @@ public abstract class UserMapperDecorator implements UserMapper {
     public UserAccount userDtoToUserAccount(UserDto user) {
         UserAccount account = delegate.userDtoToUserAccount(user);
         account.setPassword(passwordEncoder.encode(user.getPassword()));
-        account.setEnabled(false);
 
         return account;
     }

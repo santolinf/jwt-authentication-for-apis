@@ -23,7 +23,7 @@ public class UserSessionLogoutIntegrationTest extends BaseIntegrationTest {
 
     @BeforeEach
     public void commenceUserSession() throws Exception {
-        token = login("rick@test.com", "Ch4ng*me0lease");
+        token = loginAs("rick@test.com");
     }
 
     @Test
