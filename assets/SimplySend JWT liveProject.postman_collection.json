@@ -54,7 +54,7 @@
 						},
 						{
 							"key": "password",
-							"value": "",
+							"value": "!1cense2Kill",
 							"type": "text"
 						}
 					]
@@ -89,7 +89,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/v1/items?type=&page=2&limit=2",
+					"raw": "localhost:8080/v1/items?type=&page=&limit=",
 					"host": [
 						"localhost"
 					],
@@ -105,11 +105,11 @@
 						},
 						{
 							"key": "page",
-							"value": "2"
+							"value": ""
 						},
 						{
 							"key": "limit",
-							"value": "2"
+							"value": ""
 						}
 					]
 				}
@@ -200,7 +200,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "localhost:8080/v1/orders?reportee=jb@test.com",
+					"raw": "localhost:8080/v1/orders?status=REQUESTED&reportee=jb@test.com&limit=&page=",
 					"host": [
 						"localhost"
 					],
@@ -211,9 +211,62 @@
 					],
 					"query": [
 						{
+							"key": "status",
+							"value": "REQUESTED"
+						},
+						{
 							"key": "reportee",
 							"value": "jb@test.com"
+						},
+						{
+							"key": "limit",
+							"value": ""
+						},
+						{
+							"key": "page",
+							"value": ""
 						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Approve Order",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"approve\": false,\r\n    \"comment\": \"Not available\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost:8080/v1/orders/2/approve",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"orders",
+						"2",
+						"approve"
 					]
 				}
 			},

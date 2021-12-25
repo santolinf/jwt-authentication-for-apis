@@ -1,12 +1,15 @@
 package com.manning.liveproject.simplysend.service;
 
+import com.manning.liveproject.simplysend.api.dto.OrderApprovalDto;
 import com.manning.liveproject.simplysend.api.dto.OrderDto;
 import com.manning.liveproject.simplysend.api.dto.PagedResponse;
 import com.manning.liveproject.simplysend.api.enums.OrderStatus;
+import com.manning.liveproject.simplysend.auth.util.SecurityHelper;
 import com.manning.liveproject.simplysend.entity.Order;
 import com.manning.liveproject.simplysend.entity.UserAccount;
 import com.manning.liveproject.simplysend.entity.User;
 import com.manning.liveproject.simplysend.exceptions.InvalidIdentifierException;
+import com.manning.liveproject.simplysend.exceptions.OrderApprovalException;
 import com.manning.liveproject.simplysend.mapper.OrderMapper;
 import com.manning.liveproject.simplysend.mapper.PagedOrdersResponseMapper;
 import com.manning.liveproject.simplysend.repository.OrderRepository;
@@ -18,7 +21,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -29,6 +31,7 @@ import static java.util.Optional.ofNullable;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class OrdersService {
 
     private final PagedOrdersResponseMapper pagedResponseMapper;
@@ -42,7 +45,7 @@ public class OrdersService {
         try {
             order.setStatus(OrderStatus.REQUESTED.getValue());
 
-            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            String username = SecurityHelper.getAuthenticatedUsername();
             User owner = userAccountRepository.findByUsername(username).map(UserAccount::getUser).orElse(null);
             order.setOwner(owner);
 
@@ -55,7 +58,6 @@ public class OrdersService {
         }
     }
 
-    @Transactional
     public PagedResponse<OrderDto> findOrders(OrderStatus status, String reportee, Integer limit, Integer page) {
         log.debug("Find orders: status=[{}], reportee=[{}], limit=[{}], page=[{}]", status, reportee, limit, page);
 
@@ -79,7 +81,16 @@ public class OrdersService {
         return pagedResponseMapper.pageToPagedResponse(orders, orderMapper);
     }
 
-    public void approveOrder(String orderId) {
-        // TODO
+    public void approveOrder(Long orderId, OrderApprovalDto approval) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new InvalidIdentifierException("Order ID does not exits: " + orderId));
+
+        if (Objects.isNull(order.getOwner()) || SecurityHelper.isAuthenticatedUsername(order.getOwner().getEmail())) {
+            throw new OrderApprovalException("Cannot approve order");
+        }
+
+        order.setStatus(Boolean.TRUE.equals(approval.getApprove()) ? OrderStatus.APPROVED.getValue() : OrderStatus.DENIED.getValue());
+        order.setComment(approval.getComment());
+        orderRepository.save(order);
     }
 }

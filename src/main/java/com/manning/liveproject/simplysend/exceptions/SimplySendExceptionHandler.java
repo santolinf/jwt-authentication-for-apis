@@ -49,6 +49,14 @@ public class SimplySendExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponse.build(), new HttpHeaders(), HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(OrderApprovalException.class)
+    public ResponseEntity<ErrorDto> handleOrderApprovalError(OrderApprovalException e) {
+        ErrorDto.ErrorDtoBuilder errorResponse = createErrorResponse(ErrorCode.CONFLICT)
+                .message(e.getMessage());
+
+        return new ResponseEntity<>(errorResponse.build(), new HttpHeaders(), HttpStatus.CONFLICT);
+    }
+
     @Override
     protected ResponseEntity<Object> handleTypeMismatch(
             TypeMismatchException e,

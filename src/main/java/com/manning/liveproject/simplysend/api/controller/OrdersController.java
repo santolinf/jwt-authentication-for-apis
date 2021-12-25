@@ -1,5 +1,6 @@
 package com.manning.liveproject.simplysend.api.controller;
 
+import com.manning.liveproject.simplysend.api.dto.OrderApprovalDto;
 import com.manning.liveproject.simplysend.api.dto.OrderDto;
 import com.manning.liveproject.simplysend.api.dto.PagedResponse;
 import com.manning.liveproject.simplysend.api.enums.OrderStatus;
@@ -95,8 +96,10 @@ public class OrdersController {
     @ResponseStatus(HttpStatus.CREATED)
     public void approveOrder(
             @Parameter(in = ParameterIn.PATH, description = "The id of the order to retrieve", required = true, schema = @Schema())
-            @PathVariable("orderId") String orderId
+            @PathVariable("orderId") Long orderId,
+            @Parameter(in = ParameterIn.DEFAULT, description = "Send the Approval Object", required = true, schema = @Schema())
+            @Valid @RequestBody OrderApprovalDto approval
     ) {
-        ordersService.approveOrder(orderId);
+        ordersService.approveOrder(orderId, approval);
     }
 }

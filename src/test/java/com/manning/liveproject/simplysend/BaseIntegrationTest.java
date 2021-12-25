@@ -45,13 +45,17 @@ public abstract class BaseIntegrationTest {
     protected ItemRepository itemRepository;
 
     protected void createAccountInDb(String emailId, String password) {
+        createAccountInDb(emailId, password, Role.REPORTEE);
+    }
+
+    protected void createAccountInDb(String emailId, String password, Role role) {
         UserAccount account = UserAccount.builder()
                 .username(emailId)
                 .password(passwordEncoder.encode(password))
                 .enabled(true)
                 .user(User.builder()
                         .email(emailId)
-                        .role(Role.REPORTEE)
+                        .role(role)
                         .build()
                 )
                 .build();
@@ -59,9 +63,13 @@ public abstract class BaseIntegrationTest {
     }
 
     protected String loginAs(String emailId) throws Exception {
+        return loginAs(emailId, Role.REPORTEE);
+    }
+
+    protected String loginAs(String emailId, Role role) throws Exception {
         String password = "Ch4ng*me0lease";
         if (userAccountRepository.findByUsername(emailId).isEmpty()) {
-            createAccountInDb(emailId, password);
+            createAccountInDb(emailId, password, role);
         }
 
         String token = mockMvc.perform(post("/login")

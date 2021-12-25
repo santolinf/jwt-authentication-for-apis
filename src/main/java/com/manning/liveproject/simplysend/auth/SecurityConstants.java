@@ -10,5 +10,7 @@ public final class SecurityConstants {
 
     public static final String HEADER_X_AUTH_MESSAGE = "X-Auth-Message";
 
+    public static final String TOKEN_AUTHORITY_CLAIM_NAME = "authority";
+
     private SecurityConstants() {}
 }
