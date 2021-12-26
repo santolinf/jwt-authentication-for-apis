@@ -120,4 +120,36 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
                         .header("Authorization", TOKEN_PREFIX + token))
                 .andDo(print()).andExpect(status().isOk());
     }
+
+    @Test
+    public void givenNonAdminRole_whenRequestUserDetails_thenOnlyAllowRequesterDetails() throws Exception {
+        String token = loginAs("aaron@test.com", Role.REPORTEE);
+
+        Long aaronId = userRepository.getUserByEmail("aaron@test.com").getId();
+
+        mockMvc.perform(get("/users/" + aaronId)
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isOk());
+
+
+        token = loginAs("linda@test.com", Role.MGR);
+
+        mockMvc.perform(get("/users/" + aaronId)
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void givenAdminRole_whenRevokeUser_thenUserCannotLogin() throws Exception {
+        loginAs("xavier@test.com");
+        Long xavierId = userRepository.getUserByEmail("xavier@test.com").getId();
+
+        String token = loginAs("admin@test.com", Role.ADMIN);
+
+        mockMvc.perform(post("/users/" + xavierId + "/revoke")
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isOk());
+
+        failLoginAs("xavier@test.com");
+    }
 }

@@ -69,13 +69,25 @@ public class UserService {
         return pagedResponseMapper.pageToPagedResponse(users, mapper);
     }
 
-    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN.name()) " +
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN) " +
             "or #userId == @userRepository.getUserByEmail(authentication.name)?.id")
     public UserDto findUser(Long userId) {
         log.debug("Find user: id=[{}]", userId);
 
-        return mapper.entityToDto(userRepository.findById(userId)
-                .orElseThrow(() -> new InvalidIdentifierException("User ID does not exist: " + userId))
-        );
+        return mapper.entityToDto(getUser(userId));
+    }
+
+    @PreAuthorize("#userId != @userRepository.getUserByEmail(authentication.name)?.id")
+    public void revokeUser(Long userId) {
+        UserAccount account = userAccountRepository.findByUsername(getUser(userId).getEmail())
+                .orElseThrow(() -> new InvalidIdentifierException("User ID does not exist: " + userId));
+
+        account.setEnabled(false);
+        userAccountRepository.save(account);
+    }
+
+    private User getUser(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new InvalidIdentifierException("User ID does not exist: " + id));
     }
 }

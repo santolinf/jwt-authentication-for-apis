@@ -54,7 +54,7 @@ public class UsersController {
             @ApiResponse(responseCode = "200", description = "A paged array of users"),
             @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
     })
-    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN.name())")
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN)")
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResponse<UserDto> listUsers(
@@ -77,7 +77,7 @@ public class UsersController {
             @SecurityRequirement(name = "jwt")
     })
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User info"),
+            @ApiResponse(responseCode = "200", description = "User details retrieved"),
             @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
     })
     @GetMapping(path = "{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -87,5 +87,22 @@ public class UsersController {
             @PathVariable("userId") Long userId
     ) {
         return userService.findUser(userId);
+    }
+
+    @Operation(summary = "Revoke a specific user", tags = { "users" }, security = {
+            @SecurityRequirement(name = "jwt")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User revoked"),
+            @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
+    })
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN)")
+    @PostMapping(path = "{userId}/revoke")
+    @ResponseStatus(HttpStatus.OK)
+    public void revokeUser(
+            @Parameter(in = ParameterIn.PATH, description = "The id of the user to revoke", required = true, schema = @Schema())
+            @PathVariable("userId") Long userId
+    ) {
+        userService.revokeUser(userId);
     }
 }

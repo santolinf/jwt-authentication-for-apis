@@ -8,6 +8,7 @@ import com.manning.liveproject.simplysend.entity.User;
 import com.manning.liveproject.simplysend.repository.ItemRepository;
 import com.manning.liveproject.simplysend.repository.OrderRepository;
 import com.manning.liveproject.simplysend.repository.UserAccountRepository;
+import com.manning.liveproject.simplysend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
+import static org.assertj.core.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -37,6 +39,9 @@ public abstract class BaseIntegrationTest {
 
     @Autowired
     protected UserAccountRepository userAccountRepository;
+
+    @Autowired
+    protected UserRepository userRepository;
 
     @Autowired
     protected OrderRepository orderRepository;
@@ -80,6 +85,21 @@ public abstract class BaseIntegrationTest {
                 .andReturn().getResponse().getHeader("Authorization");
 
         return token.replace(SecurityConstants.TOKEN_PREFIX, "");
+    }
+
+    protected void failLoginAs(String emailId) throws Exception {
+        failLoginAs(emailId, Role.REPORTEE);
+    }
+
+    protected void failLoginAs(String emailId, Role role)  throws Exception {
+        try {
+            loginAs(emailId, role);
+        } catch (AssertionError loginFailure) {
+            // expecting this to happen
+            return;
+        }
+
+        fail(emailId  + " has successfully logged in");
     }
 
     protected void logout(String token) throws Exception {

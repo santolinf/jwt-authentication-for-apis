@@ -56,7 +56,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "200", description = "A paged array of orders"),
             @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
     })
-    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).MGR.name())")
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).MGR)")
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.OK)
     public PagedResponse<OrderDto> listOrders(
@@ -94,7 +94,7 @@ public class OrdersController {
             @ApiResponse(responseCode = "201", description = "Order approved"),
             @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
     })
-    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).MGR.name())")
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).MGR)")
     @PostMapping(path = "{orderId}/approve", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public void approveOrder(
