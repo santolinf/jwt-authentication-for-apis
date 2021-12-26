@@ -4,6 +4,7 @@ import com.manning.liveproject.simplysend.api.dto.PagedResponse;
 import com.manning.liveproject.simplysend.api.dto.UserDto;
 import com.manning.liveproject.simplysend.entity.User;
 import com.manning.liveproject.simplysend.entity.UserAccount;
+import com.manning.liveproject.simplysend.exceptions.InvalidIdentifierException;
 import com.manning.liveproject.simplysend.exceptions.UsernameAlreadyExistsException;
 import com.manning.liveproject.simplysend.mapper.PagedUsersResponseMapper;
 import com.manning.liveproject.simplysend.mapper.UserMapper;
@@ -15,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import static java.util.Optional.ofNullable;
@@ -65,5 +67,15 @@ public class UserService {
         log.debug("Loaded {} of {} users (page {} of {})", users.getNumberOfElements(), users.getTotalElements(), pageNumber, totalPages);
 
         return pagedResponseMapper.pageToPagedResponse(users, mapper);
+    }
+
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN.name()) " +
+            "or #userId == @userRepository.getUserByEmail(authentication.name)?.id")
+    public UserDto findUser(Long userId) {
+        log.debug("Find user: id=[{}]", userId);
+
+        return mapper.entityToDto(userRepository.findById(userId)
+                .orElseThrow(() -> new InvalidIdentifierException("User ID does not exist: " + userId))
+        );
     }
 }

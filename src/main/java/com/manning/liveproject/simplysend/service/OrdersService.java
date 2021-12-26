@@ -84,7 +84,7 @@ public class OrdersService {
 
     public void approveOrder(Long orderId, OrderApprovalDto approval) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new InvalidIdentifierException("Order ID does not exits: " + orderId));
+                .orElseThrow(() -> new InvalidIdentifierException("Order ID does not exist: " + orderId));
 
         if (Objects.isNull(order.getOwner()) || SecurityHelper.isAuthenticatedUsername(order.getOwner().getEmail())) {
             throw new OrderApprovalException("Cannot approve order");

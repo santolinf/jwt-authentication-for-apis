@@ -72,4 +72,20 @@ public class UsersController {
     ) {
         return userService.findUsers(limit, page);
     }
+
+    @Operation(summary = "Info for a specific user", tags = { "users" }, security = {
+            @SecurityRequirement(name = "jwt")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User info"),
+            @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
+    })
+    @GetMapping(path = "{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto showUserById(
+            @Parameter(in = ParameterIn.PATH, description = "The id of the user to retrieve", required = true, schema = @Schema())
+            @PathVariable("userId") Long userId
+    ) {
+        return userService.findUser(userId);
+    }
 }
