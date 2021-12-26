@@ -9,15 +9,21 @@ import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 @DecoratedWith(UserMapperDecorator.class)
-public interface UserMapper {
+public interface UserMapper extends PageableContentMapper<UserDto, User> {
 
-    @Mapping(source = "emailId", target = "username")
+    @Mapping(target = "username", source = "emailId")
     @Mapping(target = "enabled", ignore = true)
     @Mapping(target = "user", ignore = true)
     UserAccount userDtoToUserAccount(UserDto user);
 
-    @Mapping(source = "emailId", target = "email")
-    @Mapping(source = "role", target = "role")
+    @Mapping(target = "email", source = "emailId")
+    @Mapping(target = "role", source = "role")
     @Mapping(target = "manager", ignore = true)
     User userDtoToUser(UserDto user);
+
+    @Mapping(target = "emailId", source = "email")
+    @Mapping(target = "managerId", source = "manager.id")
+    @Mapping(target = "password", ignore = true)
+    @Override
+    UserDto entityToDto(User entity);
 }

@@ -65,7 +65,8 @@ public class OrdersService {
         Pageable pageRequest = PageRequest.of(ofNullable(page).orElse(0), ofNullable(limit).orElse(100));
 
         // find reportee
-        Page<Order> orders; User owner;
+        Page<Order> orders;
+        User owner;
         if (Strings.isNotEmpty(reportee)
                 && Objects.nonNull(owner = userAccountRepository.findByUsername(reportee).map(UserAccount::getUser).orElse(null))
         ) {
@@ -83,7 +84,7 @@ public class OrdersService {
 
     public void approveOrder(Long orderId, OrderApprovalDto approval) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new InvalidIdentifierException("Order ID does not exits: " + orderId));
+                .orElseThrow(() -> new InvalidIdentifierException("Order ID does not exist: " + orderId));
 
         if (Objects.isNull(order.getOwner()) || SecurityHelper.isAuthenticatedUsername(order.getOwner().getEmail())) {
             throw new OrderApprovalException("Cannot approve order");

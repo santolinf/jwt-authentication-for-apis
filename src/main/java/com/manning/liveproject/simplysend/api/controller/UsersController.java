@@ -1,5 +1,6 @@
 package com.manning.liveproject.simplysend.api.controller;
 
+import com.manning.liveproject.simplysend.api.dto.PagedResponse;
 import com.manning.liveproject.simplysend.api.dto.UserDto;
 import com.manning.liveproject.simplysend.service.UserService;
 import io.swagger.annotations.Api;
@@ -9,13 +10,17 @@ import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Api(tags = { "users" })
 @RestController
@@ -40,5 +45,64 @@ public class UsersController {
             @Valid @RequestBody UserDto user
     ) {
         userService.createUser(user);
+    }
+
+    @Operation(summary = "List all users", tags = { "users" }, security = {
+            @SecurityRequirement(name = "jwt")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "A paged array of users"),
+            @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
+    })
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN)")
+    @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public PagedResponse<UserDto> listUsers(
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "How many users to return at one time (max 100)"
+            )
+            @Valid @Min(1) @Max(100)
+            @RequestParam(value = "limit", required = false) Integer limit,
+            @Parameter(
+                    in = ParameterIn.QUERY,
+                    description = "page number"
+            )
+            @RequestParam(value = "page", required = false) Integer page
+    ) {
+        return userService.findUsers(limit, page);
+    }
+
+    @Operation(summary = "Info for a specific user", tags = { "users" }, security = {
+            @SecurityRequirement(name = "jwt")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User details retrieved"),
+            @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
+    })
+    @GetMapping(path = "{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseStatus(HttpStatus.OK)
+    public UserDto showUserById(
+            @Parameter(in = ParameterIn.PATH, description = "The id of the user to retrieve", required = true, schema = @Schema())
+            @PathVariable("userId") Long userId
+    ) {
+        return userService.findUser(userId);
+    }
+
+    @Operation(summary = "Revoke a specific user", tags = { "users" }, security = {
+            @SecurityRequirement(name = "jwt")
+    })
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User revoked"),
+            @ApiResponse(responseCode = "401", description = "Authentication information is missing or invalid")
+    })
+    @PreAuthorize("hasAuthority(T(com.manning.liveproject.simplysend.api.enums.Role).ADMIN)")
+    @PostMapping(path = "{userId}/revoke")
+    @ResponseStatus(HttpStatus.OK)
+    public void revokeUser(
+            @Parameter(in = ParameterIn.PATH, description = "The id of the user to revoke", required = true, schema = @Schema())
+            @PathVariable("userId") Long userId
+    ) {
+        userService.revokeUser(userId);
     }
 }

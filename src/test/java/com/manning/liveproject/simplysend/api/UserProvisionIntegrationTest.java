@@ -9,14 +9,16 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.MediaType;
 
+import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class CreateUserIntegrationTest extends BaseIntegrationTest {
+public class UserProvisionIntegrationTest extends BaseIntegrationTest {
 
     @AfterAll
     public void tearDown() {
@@ -108,5 +110,46 @@ public class CreateUserIntegrationTest extends BaseIntegrationTest {
         assertThat(account.getPassword()).isNotEqualTo(plainTextPassword);
 
         assertThat(account.getUser()).isNotNull();
+    }
+
+    @Test
+    public void givenAdminRole_whenListUsers_thenAllowRequest() throws Exception {
+        String token = loginAs("admin@test.com", Role.ADMIN);
+
+        mockMvc.perform(get("/users")
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenNonAdminRole_whenRequestUserDetails_thenOnlyAllowRequesterDetails() throws Exception {
+        String token = loginAs("aaron@test.com", Role.REPORTEE);
+
+        Long aaronId = userRepository.getUserByEmail("aaron@test.com").getId();
+
+        mockMvc.perform(get("/users/" + aaronId)
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isOk());
+
+
+        token = loginAs("linda@test.com", Role.MGR);
+
+        mockMvc.perform(get("/users/" + aaronId)
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void givenAdminRole_whenRevokeUser_thenUserCannotLogin() throws Exception {
+        loginAs("xavier@test.com");
+        Long xavierId = userRepository.getUserByEmail("xavier@test.com").getId();
+
+        String token = loginAs("admin@test.com", Role.ADMIN);
+
+        mockMvc.perform(post("/users/" + xavierId + "/revoke")
+                        .header("Authorization", TOKEN_PREFIX + token))
+                .andDo(print()).andExpect(status().isOk());
+
+        failLoginAs("xavier@test.com");
     }
 }

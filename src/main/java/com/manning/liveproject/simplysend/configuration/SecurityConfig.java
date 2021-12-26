@@ -1,6 +1,5 @@
 package com.manning.liveproject.simplysend.configuration;
 
-import com.manning.liveproject.simplysend.api.enums.Role;
 import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.config.JwtProperties;
 import com.manning.liveproject.simplysend.auth.fliter.JwtHeaderAuthenticationFilter;
@@ -15,6 +14,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,6 +29,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
@@ -76,8 +77,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
                 .authorizeHttpRequests()
                     .mvcMatchers(HttpMethod.POST, SecurityConstants.SIGN_UP_URL).permitAll()
-                    .mvcMatchers(HttpMethod.GET, "/orders").hasAuthority(Role.MGR.name())
-                    .mvcMatchers(HttpMethod.POST, "/orders/*/approve").hasAuthority(Role.MGR.name())
                     .anyRequest().authenticated()
 
                 .and()

@@ -108,7 +108,13 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
         Long orderId = orderRepository.findAll().stream().findFirst().map(Order::getId).orElse(0L);
 
         mockMvc.perform(post("/orders/" + orderId + "/approve")
-                        .header("Authorization", TOKEN_PREFIX + token))
+                        .header("Authorization", TOKEN_PREFIX + token)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(OrderApprovalDto.builder()
+                                        .approve(true)
+                                        .comment("this is mine")
+                                        .build())
+                        ))
                 .andDo(print()).andExpect(status().isForbidden());
     }
 
@@ -126,8 +132,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
         mockMvc.perform(post("/orders/" + orderId + "/approve")
                         .header("Authorization", TOKEN_PREFIX + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(
-                                OrderApprovalDto.builder()
+                        .content(objectMapper.writeValueAsString(OrderApprovalDto.builder()
                                         .approve(true)
                                         .comment("approved")
                                         .build())
