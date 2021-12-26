@@ -65,7 +65,8 @@ public class OrdersService {
         Pageable pageRequest = PageRequest.of(ofNullable(page).orElse(0), ofNullable(limit).orElse(100));
 
         // find reportee
-        Page<Order> orders; User owner;
+        Page<Order> orders;
+        User owner;
         if (Strings.isNotEmpty(reportee)
                 && Objects.nonNull(owner = userAccountRepository.findByUsername(reportee).map(UserAccount::getUser).orElse(null))
         ) {
