@@ -69,6 +69,23 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         final HttpStatusEntryPoint failedAuthenticationEntryPoint = new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
+
+        http.headers().defaultsDisabled()
+                // set to DENY in order to prevent the API responses being loaded in a frame or iframe
+                .frameOptions().deny()
+                // the current guidance is to set to “0” on API responses to completely disable these protections due to security issues they can also introduce
+                .xssProtection().xssProtectionEnabled(false).and()
+                // policy for restricting where content can be loaded from
+                // default-src none prevents the response from loading any scripts or resources
+                // frame-ancestors none replacement for X-Frame-Options, this prevents the response being loaded into an iframe
+                // sandbox n/a disables scripts and other potentially dangerous content from being executed
+                .contentSecurityPolicy("default-src 'none'; frame-ancestors 'none'; sandbox").and()
+                // set to nosniff to prevent the browser guessing the correct Content-Type
+                .contentTypeOptions().and()
+                // always access via HTTPS
+                .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000).and()
+                .cacheControl();
+
         http
                 .addFilterBefore(
                         new JwtHeaderAuthenticationFilter(tokenService(), sessionService),
