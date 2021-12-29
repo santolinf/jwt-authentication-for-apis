@@ -52,7 +52,8 @@ public class UserService {
         try {
             userAccountRepository.save(account);
         } catch (DataIntegrityViolationException e) {
-            throw new UsernameAlreadyExistsException(account.getUsername() + " already exists");
+            log.warn("{} already exists", account.getUsername());
+            throw new UsernameAlreadyExistsException("Account cannot be created");
         }
     }
 

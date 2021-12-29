@@ -15,6 +15,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.MediaType;
 
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -35,6 +36,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/orders")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderPayload)))
                 .andDo(print()).andExpect(status().isUnauthorized());
@@ -50,6 +52,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/orders")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderPayload)))
@@ -73,6 +76,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/orders")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(orderPayload)))
@@ -108,6 +112,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
         Long orderId = orderRepository.findAll().stream().findFirst().map(Order::getId).orElse(0L);
 
         mockMvc.perform(post("/orders/" + orderId + "/approve")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(OrderApprovalDto.builder()
@@ -130,6 +135,7 @@ public class OrderWorkflowIntegrationTest extends BaseIntegrationTest {
         Long orderId = orderRepository.findAll().stream().findFirst().map(Order::getId).orElse(0L);
 
         mockMvc.perform(post("/orders/" + orderId + "/approve")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(OrderApprovalDto.builder()
