@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -29,6 +30,7 @@ public class ItemsIntegrationTest extends BaseIntegrationTest {
         String token = loginAs("james@test.com");
 
         mockMvc.perform(get("/items")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token))
                 .andDo(print()).andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty())

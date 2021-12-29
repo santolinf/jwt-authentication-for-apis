@@ -27,6 +27,7 @@ import org.springframework.security.web.authentication.AuthenticationEntryPointF
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -86,6 +87,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .httpStrictTransportSecurity().includeSubDomains(true).maxAgeInSeconds(31536000).and()
                 .cacheControl();
 
+        http.csrf().csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse());
+
         http
                 .addFilterBefore(
                         new JwtHeaderAuthenticationFilter(tokenService(), sessionService),
@@ -101,7 +104,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 .and()
-                .csrf().disable()
                 .httpBasic().disable()
                 .formLogin()
                     .loginProcessingUrl(SecurityConstants.LOGIN_URL)

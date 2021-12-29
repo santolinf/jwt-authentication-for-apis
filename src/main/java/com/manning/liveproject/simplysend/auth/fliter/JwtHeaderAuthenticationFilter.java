@@ -3,11 +3,11 @@ package com.manning.liveproject.simplysend.auth.fliter;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.collect.Lists;
-import com.manning.liveproject.simplysend.auth.SecurityConstants;
 import com.manning.liveproject.simplysend.auth.service.InMemorySessionService;
 import com.manning.liveproject.simplysend.auth.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -60,11 +60,11 @@ public class JwtHeaderAuthenticationFilter extends OncePerRequestFilter {
                 log.debug("JWT: {}", authentication);
             } else {
                 log.debug("JWT: Invalid User Session");
-                response.setHeader(SecurityConstants.HEADER_X_AUTH_MESSAGE, "Invalid User Session");
+                response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
             }
         } catch (TokenExpiredException e) {
             log.debug("JWT: {}", e.getMessage());
-            response.setHeader(SecurityConstants.HEADER_X_AUTH_MESSAGE, "Token expired");
+            response.setHeader(HttpHeaders.WWW_AUTHENTICATE, "Bearer error=\"invalid_token\", error_description=\"Expired\"");
         }
 
         filterChain.doFilter(request, response);

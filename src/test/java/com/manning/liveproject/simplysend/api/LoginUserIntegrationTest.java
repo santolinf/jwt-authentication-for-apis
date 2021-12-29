@@ -7,6 +7,7 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.http.MediaType;
 
 import static org.hamcrest.Matchers.matchesPattern;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -23,6 +24,7 @@ public class LoginUserIntegrationTest extends BaseIntegrationTest {
     @Test
     public void givenNonExistentUsername_whenLogin_thenReturnUnauthorised() throws Exception {
         mockMvc.perform(post("/login")
+                .with(csrf().asHeader())
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                 .param("emailId", "I.dont.exist@test.com")
                 .param("password", "opensesame"))
@@ -37,6 +39,7 @@ public class LoginUserIntegrationTest extends BaseIntegrationTest {
         createAccountInDb(emailId, password);
 
         mockMvc.perform(post("/login")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("emailId", emailId)
                         .param("password", "opensesame"))
@@ -51,6 +54,7 @@ public class LoginUserIntegrationTest extends BaseIntegrationTest {
         createAccountInDb(emailId, password);
 
         mockMvc.perform(post("/login")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("emailId", emailId)
                         .param("password", password))

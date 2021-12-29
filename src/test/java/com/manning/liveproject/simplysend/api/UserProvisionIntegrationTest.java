@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -30,8 +31,9 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
         UserDto emptyUserPayload = UserDto.builder().build();
 
         mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(emptyUserPayload)))
+                        .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(emptyUserPayload)))
                 .andDo(print()).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Field values violations"))
                 .andExpect(jsonPath("$.violations.emailId").value("must not be null"));
@@ -42,8 +44,9 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
         UserDto newUserPayload = UserDto.builder().emailId("frank@test").build();
 
         mockMvc.perform(post("/users")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(newUserPayload)))
+                        .with(csrf().asHeader())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(newUserPayload)))
                 .andDo(print()).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Field values violations"))
                 .andExpect(jsonPath("$.violations.emailId").value("must be a well-formed email address"));
@@ -62,6 +65,7 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserPayload)))
                 .andDo(print()).andExpect(status().isConflict());
@@ -74,6 +78,7 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserPayload)))
                 .andDo(print()).andExpect(status().isBadRequest())
@@ -99,6 +104,7 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
                 .build();
 
         mockMvc.perform(post("/users")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserPayload)))
                 .andDo(print()).andExpect(status().isCreated());
@@ -147,6 +153,7 @@ public class UserProvisionIntegrationTest extends BaseIntegrationTest {
         String token = loginAs("admin@test.com", Role.ADMIN);
 
         mockMvc.perform(post("/users/" + xavierId + "/revoke")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token))
                 .andDo(print()).andExpect(status().isOk());
 

@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import static com.manning.liveproject.simplysend.auth.SecurityConstants.TOKEN_PREFIX;
 import static org.assertj.core.api.Assertions.fail;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -78,6 +79,7 @@ public abstract class BaseIntegrationTest {
         }
 
         String token = mockMvc.perform(post("/login")
+                        .with(csrf().asHeader())
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED)
                         .param("emailId", emailId)
                         .param("password", password))
@@ -104,6 +106,7 @@ public abstract class BaseIntegrationTest {
 
     protected void logout(String token) throws Exception {
         mockMvc.perform(post("/logout")
+                        .with(csrf().asHeader())
                         .header("Authorization", TOKEN_PREFIX + token))
                 .andDo(print()).andExpect(status().isOk());
     }
