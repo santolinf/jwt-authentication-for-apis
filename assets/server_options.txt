@@ -1,3 +1,6 @@
--Dlogging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+-Dsimplysend.web.cors.allowed-origins=localhost
 -Dspring.jpa.show-sql=true
+-Dlogging.level.org.springframework.security.web.FilterChainProxy=DEBUG
+-Dlogging.level.org.springframework.security.web.csrf=DEBUG
+-Dlogging.level.org.springframework.web.cors=DEBUG
 -Dlogging.level.com.manning.liveproject.simplysend=DEBUG
